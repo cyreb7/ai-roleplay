@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: "AI Roleplay",
 };
 
-export default function RootLayout({
+export default function Layout({
   children,
 }: Readonly<{
   children: React.ReactNode;
