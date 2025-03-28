@@ -1,15 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import Chat from "./Chat";
+import Chat from "./components/chat";
+import AiManager from "./ai/aiManager";
+import ChatMessage from "./ai/chatMessage";
 
 export default function Home() {
-  const [messageHistory, setMessages] = useState<string[]>([]);
+  const [messageHistory, setMessages] = useState<ChatMessage[]>([]);
 
-  const sendMessage = (message: string) => {
-    alert(`Sending message ${message}`);
-    setMessages([...messageHistory, message]);
-    return Promise.resolve();
+  const sendMessage = async (message: string) => {
+    const manager = new AiManager();
+    const newMessage = await manager.sendMessage(messageHistory, message);
+
+    for await (const message of newMessage) {
+      setMessages([...messageHistory, message]);
+    }
   };
 
   return (

@@ -1,10 +1,11 @@
 "use client";
 
 import React, { useState } from "react";
-import MessageHistory from "./MessageHistory";
+import MessageHistory from "./messageHistory";
+import ChatMessage from "../ai/chatMessage";
 
 interface ChatProps {
-  messages: string[];
+  messages: ChatMessage[];
   sendMessage: (message: string) => Promise<void>;
 }
 
@@ -46,7 +47,9 @@ export default function Chat({ messages, sendMessage }: ChatProps) {
         <button
           onClick={handleSendMessage}
           className="bg-blue-500 text-white p-2 rounded hover:bg-blue-700"
-        >Send</button>
+        >
+          Send
+        </button>
       </div>
     </div>
   );
