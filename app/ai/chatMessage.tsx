@@ -2,19 +2,26 @@ import { AbortableAsyncIterator, ChatResponse, Message } from "ollama";
 
 export default class ChatMessage {
   #message;
+  #streaming: AsyncGenerator<ChatMessage, void, unknown> | null;
 
   constructor(message: Message) {
     this.#message = message;
+    this.#streaming = null;
   }
 
   static makeFromStream(
     newMessage: AbortableAsyncIterator<ChatResponse>,
-  ): AsyncGenerator<ChatMessage, void, unknown> {
+  ): ChatMessage {
     const message = new ChatMessage({} as Message);
-    return message.streamMessage(newMessage);
+    message.streamMessage(newMessage);
+    return message;
   }
 
-  async *streamMessage(
+  streamMessage(newMessage: AbortableAsyncIterator<ChatResponse>): void {
+    this.#streaming = this.#makeStreamMessageGenerator(newMessage);
+  }
+
+  async *#makeStreamMessageGenerator(
     newMessage: AbortableAsyncIterator<ChatResponse>,
   ): AsyncGenerator<ChatMessage, void, unknown> {
     let content = "";
@@ -32,5 +39,9 @@ export default class ChatMessage {
 
   get message(): Message {
     return this.#message;
+  }
+
+  get done(): AsyncGenerator<ChatMessage, void, unknown> | null {
+    return this.#streaming;
   }
 }

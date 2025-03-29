@@ -2,9 +2,7 @@ import ollama from "ollama/browser";
 import ChatMessage from "./chatMessage";
 
 export default class AiManager {
-  async sendMessage(
-    messageHistory: ChatMessage[],
-  ): Promise<AsyncGenerator<ChatMessage, void, unknown>> {
+  async sendMessage(messageHistory: ChatMessage[]): Promise<ChatMessage> {
     const response = await ollama.chat({
       model: "gemma3:4b",
       messages: [...messageHistory.map((msg) => msg.message)],

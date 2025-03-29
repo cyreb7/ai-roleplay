@@ -13,10 +13,7 @@ export default function Home() {
     const newMessage = manager.makeMessage(message);
     messageHistory.push(newMessage);
     const responseMessage = await manager.sendMessage(messageHistory);
-
-    for await (const message of responseMessage) {
-      setMessages([...messageHistory, message]);
-    }
+    setMessages([...messageHistory, responseMessage]);
   };
 
   return (
