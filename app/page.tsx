@@ -10,9 +10,11 @@ export default function Home() {
 
   const sendMessage = async (message: string) => {
     const manager = new AiManager();
-    const newMessage = await manager.sendMessage(messageHistory, message);
+    const newMessage = manager.makeMessage(message);
+    messageHistory.push(newMessage);
+    const responseMessage = await manager.sendMessage(messageHistory);
 
-    for await (const message of newMessage) {
+    for await (const message of responseMessage) {
       setMessages([...messageHistory, message]);
     }
   };

@@ -17,12 +17,11 @@ export default class ChatMessage {
   async *streamMessage(
     newMessage: AbortableAsyncIterator<ChatResponse>,
   ): AsyncGenerator<ChatMessage, void, unknown> {
+    let content = "";
     for await (const part of newMessage) {
-      if (!this.#message.content) {
-        this.#message = part.message;
-      } else {
-        this.#message.content += part.message.content;
-      }
+      content += part.message.content;
+      part.message.content = content;
+      this.#message = part.message;
       yield this;
     }
   }
