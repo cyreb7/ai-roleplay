@@ -4,10 +4,14 @@ import React, { useState } from "react";
 import Character from "../ai/character";
 
 interface CharacterProps {
+  title: string;
   character: Character;
 }
 
-export default function CharacterSettings({ character }: CharacterProps) {
+export default function CharacterSettings({
+  title,
+  character,
+}: CharacterProps) {
   const [name, setName] = useState(character.name);
   const [description, setDescription] = useState(character.description ?? "");
 
@@ -23,7 +27,7 @@ export default function CharacterSettings({ character }: CharacterProps) {
 
   return (
     <div className="p-6 rounded-lg shadow-md">
-      <h2 className="text-xl font-semibold mb-4">Character Settings</h2>
+      <h2 className="text-xl font-semibold mb-4">{title}</h2>
       <div className="mb-4">
         <label htmlFor="characterName" className="block text-sm font-medium">
           Name:

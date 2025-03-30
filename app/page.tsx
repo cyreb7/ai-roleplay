@@ -13,14 +13,15 @@ export default function Home() {
   const [chatAiManager, setChatAiManager] = useState<AiManager>(
     new AiManager(),
   );
-  const [chatCharacter] = useState<Character>(new Character("Character Name"));
+  const [aiCharacter] = useState<Character>(new Character("Agent"));
+  const [playerCharacter] = useState<Character>(new Character("Player"));
 
   async function sendMessage(message: string) {
-    const newMessage = chatAiManager.makeMessage(message);
+    const newMessage = chatAiManager.makeMessage(message, playerCharacter);
     messageHistory.push(newMessage);
     const responseMessage = await chatAiManager.sendMessage(
       messageHistory,
-      chatCharacter,
+      aiCharacter,
     );
     setMessages([...messageHistory, responseMessage]);
   }
@@ -38,7 +39,11 @@ export default function Home() {
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <CharacterSettings character={chatCharacter} />
+        <CharacterSettings title="AI Settings" character={aiCharacter} />
+        <CharacterSettings
+          title="Player Settings"
+          character={playerCharacter}
+        />
         <AiSettings
           title="Chat AI Settings"
           aiManager={chatAiManager}

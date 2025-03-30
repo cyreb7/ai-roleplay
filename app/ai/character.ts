@@ -19,9 +19,9 @@ export default class Character {
   }
 
   get context(): string {
-    let context = `You are ${this.#name}.`;
+    let context = `Name:\n${this.#name}.`;
     if (this.#description) {
-      context += `\n${this.#description}`;
+      context += `\n\nDescription:\n${this.#description}`;
     }
     return context;
   }
