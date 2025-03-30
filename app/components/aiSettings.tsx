@@ -28,31 +28,32 @@ export default function AiSettings({
   async function updateModels() {
     const models = await aiManager.getAllModesl();
     setAvalibleModels(models);
-    setSelectedModel(models[0].name);
-    updateModel(models[0]);
+    handleModelChange(models[0].name);
   }
 
-  function handleModelChange(event: React.ChangeEvent<HTMLSelectElement>) {
-    const selectedId = event.target.value;
-    setSelectedModel(selectedId);
-    updateModel({ name: selectedId });
+  function handleModelChange(modelName: string) {
+    setSelectedModel(modelName);
+    updateModel({ name: modelName });
   }
 
   return (
-    <div>
-      <h2>{title}</h2>
-      <label htmlFor="modelSelect">Choose AI Model:</label>
-      <select
-        id="modelSelect"
-        value={selectedModel}
-        onChange={handleModelChange}
-      >
-        {avalibleModels.map((model) => (
-          <option key={model.name} value={model.name}>
-            {model.name}
-          </option>
-        ))}
-      </select>
+    <div className="p-6 rounded-lg shadow-md">
+      <h2 className="text-xl font-semibold mb-4">{title}</h2>
+      <div className="mb-4">
+        <label htmlFor="modelSelect">Choose AI Model:</label>
+        <select
+          id="modelSelect"
+          value={selectedModel}
+          onChange={(e) => handleModelChange(e.target.value)}
+          className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+        >
+          {avalibleModels.map((model) => (
+            <option key={model.name} value={model.name}>
+              {model.name}
+            </option>
+          ))}
+        </select>
+      </div>
     </div>
   );
 }

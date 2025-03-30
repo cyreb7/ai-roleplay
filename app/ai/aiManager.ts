@@ -1,5 +1,6 @@
 import ollama from "ollama/browser";
 import ChatMessage from "./chatMessage";
+import Character from "./character";
 
 export interface AiModel {
   name: string;
@@ -13,14 +14,24 @@ export default class AiManager {
     return response.models.map((model) => ({ name: model.name }));
   }
 
-  async sendMessage(messageHistory: ChatMessage[]): Promise<ChatMessage> {
+  async sendMessage(
+    messageHistory: ChatMessage[],
+    character: Character,
+  ): Promise<ChatMessage> {
     if (!this.model) {
       throw new Error("No model selected");
     }
 
+    const messages = [
+      { role: "system", content: character.context },
+      ...messageHistory.map((msg) => msg.message),
+    ];
+
+    console.debug(messages);
+
     const response = await ollama.chat({
       model: this.model.name,
-      messages: [...messageHistory.map((msg) => msg.message)],
+      messages: messages,
       stream: true,
     });
 

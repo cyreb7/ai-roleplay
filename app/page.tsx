@@ -5,17 +5,23 @@ import Chat from "./components/chat";
 import AiManager, { AiModel } from "./ai/aiManager";
 import ChatMessage from "./ai/chatMessage";
 import AiSettings from "./components/aiSettings";
+import CharacterSettings from "./components/characterSettings";
+import Character from "./ai/character";
 
 export default function Home() {
   const [messageHistory, setMessages] = useState<ChatMessage[]>([]);
   const [chatAiManager, setChatAiManager] = useState<AiManager>(
     new AiManager(),
   );
+  const [chatCharacter] = useState<Character>(new Character("Character Name"));
 
   async function sendMessage(message: string) {
     const newMessage = chatAiManager.makeMessage(message);
     messageHistory.push(newMessage);
-    const responseMessage = await chatAiManager.sendMessage(messageHistory);
+    const responseMessage = await chatAiManager.sendMessage(
+      messageHistory,
+      chatCharacter,
+    );
     setMessages([...messageHistory, responseMessage]);
   }
 
@@ -32,6 +38,7 @@ export default function Home() {
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
+        <CharacterSettings character={chatCharacter} />
         <AiSettings
           title="Chat AI Settings"
           aiManager={chatAiManager}
