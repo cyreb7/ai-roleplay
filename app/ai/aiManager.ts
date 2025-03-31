@@ -1,7 +1,7 @@
 import ollama from "ollama/browser";
 import ChatMessage from "./chatMessage";
 import Character from "./character";
-import { Message } from "ollama";
+import { AbortableAsyncIterator, GenerateResponse, Message } from "ollama";
 
 export interface AiModel {
   name: string;
@@ -32,11 +32,28 @@ export default class AiManager {
 
     const response = await ollama.chat({
       model: this.model.name,
-      messages: messages,
       stream: true,
+      messages: messages,
     });
 
     return ChatMessage.makeFromStream(response, aiCharacter);
+  }
+
+  generate(
+    prompt: string,
+    system: string,
+  ): Promise<AbortableAsyncIterator<GenerateResponse>> {
+    if (!this.model) {
+      throw new Error("No model selected");
+    }
+    console.debug(system, prompt);
+
+    return ollama.generate({
+      model: this.model.name,
+      stream: true,
+      prompt,
+      system,
+    });
   }
 
   makeMessage(messageContent: string, character: Character): ChatMessage {

@@ -2,18 +2,21 @@
 
 import React, { useState } from "react";
 import Character from "../ai/character";
+import AiTextArea from "./aiTextArea";
+import AiManager from "../ai/aiManager";
 
 interface CharacterProps {
   title: string;
   character: Character;
+  aiManager: AiManager;
 }
 
 export default function CharacterSettings({
   title,
   character,
+  aiManager,
 }: CharacterProps) {
   const [name, setName] = useState(character.name);
-  const [description, setDescription] = useState(character.description ?? "");
 
   function handleNameChange(newName: string) {
     setName(newName);
@@ -21,7 +24,6 @@ export default function CharacterSettings({
   }
 
   function handleDescriptionChange(newDescription: string) {
-    setDescription(newDescription);
     character.description = newDescription;
   }
 
@@ -40,20 +42,12 @@ export default function CharacterSettings({
           className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         />
       </div>
-      <div className="mb-4">
-        <label
-          htmlFor="characterDescription"
-          className="block text-sm font-medium"
-        >
-          Description:
-        </label>
-        <textarea
-          id="characterDescription"
-          value={description}
-          onChange={(e) => handleDescriptionChange(e.target.value)}
-          className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-        ></textarea>
-      </div>
+      <AiTextArea
+        label="Description:"
+        aiSystemPrompt={`Write a detailed description for a character named "${name}". Do not respond with anything except the descripion.`}
+        handleContentsUpdate={handleDescriptionChange}
+        aiManager={aiManager}
+      />
     </div>
   );
 }

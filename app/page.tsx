@@ -13,6 +13,9 @@ export default function Home() {
   const [chatAiManager, setChatAiManager] = useState<AiManager>(
     new AiManager(),
   );
+  const [generateAiManager, setGenerateAiManager] = useState<AiManager>(
+    new AiManager(),
+  );
   const [aiCharacter] = useState<Character>(new Character("Agent"));
   const [playerCharacter] = useState<Character>(new Character("Player"));
 
@@ -26,9 +29,14 @@ export default function Home() {
     setMessages([...messageHistory, responseMessage]);
   }
 
-  function updateModel(model: AiModel) {
+  function updateChatModel(model: AiModel) {
     chatAiManager.model = model;
     setChatAiManager(chatAiManager);
+  }
+
+  function updateGenerateModel(model: AiModel) {
+    generateAiManager.model = model;
+    setGenerateAiManager(generateAiManager);
   }
 
   return (
@@ -39,15 +47,25 @@ export default function Home() {
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <CharacterSettings title="AI Settings" character={aiCharacter} />
+        <CharacterSettings
+          title="AI Settings"
+          character={aiCharacter}
+          aiManager={generateAiManager}
+        />
         <CharacterSettings
           title="Player Settings"
           character={playerCharacter}
+          aiManager={generateAiManager}
         />
         <AiSettings
           title="Chat AI Settings"
           aiManager={chatAiManager}
-          updateModel={updateModel}
+          updateModel={updateChatModel}
+        />
+        <AiSettings
+          title="Generation AI"
+          aiManager={generateAiManager}
+          updateModel={updateGenerateModel}
         />
       </footer>
     </div>
