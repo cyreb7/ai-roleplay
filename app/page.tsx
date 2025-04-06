@@ -9,6 +9,7 @@ import Character from "./ai/character";
 import ChatRoom from "./ai/chatRoom";
 
 export default function Home() {
+  const [room, setRoom] = useState<ChatRoom>(new ChatRoom());
   const [chatAiManager, setChatAiManager] = useState<AiManager>(
     new AiManager(),
   );
@@ -16,13 +17,10 @@ export default function Home() {
     new AiManager(),
   );
   const [aiCharacter] = useState<Character>(
-    new Character("Agent", generateAiManager),
+    new Character("Agent", generateAiManager, room),
   );
   const [playerCharacter] = useState<Character>(
-    new Character("Player", generateAiManager),
-  );
-  const [room, setRoom] = useState<ChatRoom>(
-    new ChatRoom([aiCharacter, playerCharacter]),
+    new Character("Player", generateAiManager, room),
   );
 
   async function sendMessage(message: string) {
@@ -31,6 +29,9 @@ export default function Home() {
     const responseMessage = await chatAiManager.sendMessage(room, aiCharacter);
     room.addMessage(responseMessage);
     setRoom(room);
+
+    aiCharacter.updateContext();
+    playerCharacter.updateContext();
   }
 
   function updateChatModel(model: AiModel) {

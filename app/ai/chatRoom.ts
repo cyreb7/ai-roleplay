@@ -5,9 +5,13 @@ export default class ChatRoom {
   #participants: Character[];
   #messages: ChatMessage[];
 
-  constructor(participants: Character[]) {
-    this.#participants = participants;
+  constructor() {
+    this.#participants = [];
     this.#messages = [];
+  }
+
+  addParticipant(character: Character) {
+    this.#participants.push(character);
   }
 
   addMessage(message: ChatMessage) {

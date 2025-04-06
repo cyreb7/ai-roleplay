@@ -1,7 +1,7 @@
 import ollama from "ollama/browser";
 import ChatMessage from "./chatMessage";
 import Character from "./character";
-import { AbortableAsyncIterator, GenerateResponse, Message } from "ollama";
+import { AbortableAsyncIterator, GenerateResponse } from "ollama";
 import ChatRoom from "./chatRoom";
 
 export interface AiModel {
@@ -25,7 +25,8 @@ export default class AiManager {
     }
 
     const messages = [
-      ...this.#getContextMessages(aiCharacter, room),
+      aiCharacter.getGeneralContextMessage(room),
+      ...aiCharacter.getContextMessages(room),
       ...room.messages.map((msg) => msg.message),
     ];
 
@@ -65,43 +66,5 @@ export default class AiManager {
       },
       character,
     );
-  }
-
-  #getContextMessages(aiCharacter: Character, room: ChatRoom): Message[] {
-    const historyCharacters = room.participants.filter(
-      (character) => character !== aiCharacter,
-    );
-
-    const contextMessages = [
-      this.#getGeneralContextMessage(aiCharacter, historyCharacters),
-      { role: "system", content: aiCharacter.context },
-    ];
-
-    for (const character of historyCharacters) {
-      contextMessages.push({ role: "system", content: character.context });
-    }
-
-    return contextMessages;
-  }
-
-  #getGeneralContextMessage(
-    aiCharacter: Character,
-    historyCharacters: Character[],
-  ): Message {
-    let content = `You are ${aiCharacter.name}.`;
-    const otherCharacterNames: string[] = [];
-
-    for (const character of historyCharacters) {
-      otherCharacterNames.push(character.name);
-    }
-
-    if (otherCharacterNames.length > 0) {
-      content += `\nOther characters present include: ${otherCharacterNames.join(", ")}.`;
-    }
-
-    return {
-      role: "system",
-      content: content,
-    };
   }
 }

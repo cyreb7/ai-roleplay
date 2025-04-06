@@ -1,9 +1,9 @@
-import AiManager from "./aiManager";
+import AiManager from "../aiManager";
 import Context from "./context";
 
 export default class ManualContext extends Context {
-  #getAiSystemPrompt: () => string;
-  #aiManager: AiManager;
+  getAiSystemPrompt: () => string;
+  aiManager: AiManager;
 
   constructor(
     name: string,
@@ -11,15 +11,15 @@ export default class ManualContext extends Context {
     getAiSystemPrompt: () => string,
   ) {
     super(name);
-    this.#getAiSystemPrompt = getAiSystemPrompt;
-    this.#aiManager = aiManager;
+    this.getAiSystemPrompt = getAiSystemPrompt;
+    this.aiManager = aiManager;
   }
 
   async *update(): AsyncGenerator<string> {
-    const context = this.contents || " ";
-    const response = await this.#aiManager.generate(
+    const context = this.contents;
+    const response = await this.aiManager.generate(
       context,
-      this.#getAiSystemPrompt(),
+      this.getAiSystemPrompt(),
     );
 
     this.contents = "";

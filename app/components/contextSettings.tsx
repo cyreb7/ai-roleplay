@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useId, useState } from "react";
-import Context from "../ai/context";
+import Context from "../ai/context/context";
 
 interface ContextProps {
   trait: Context;
