@@ -1,46 +1,35 @@
 "use client";
 
 import React, { useId, useState } from "react";
-import AiManager from "../ai/aiManager";
+import Context from "../ai/context";
 
-interface AiTextAreaProps {
-  label: string;
-  aiSystemPrompt: string;
-  handleContentsUpdate: (content: string) => void;
-  aiManager: AiManager;
+interface ContextProps {
+  trait: Context;
 }
 
-export default function AiTextArea({
-  label,
-  aiSystemPrompt,
-  handleContentsUpdate,
-  aiManager,
-}: AiTextAreaProps) {
-  const [contents, setContents] = useState("");
+export default function ContextSettings({ trait }: ContextProps) {
+  const [contents, setContents] = useState(trait.contents);
   const id = useId();
 
   function handleContentsChange(content: string) {
     setContents(content);
-    handleContentsUpdate(content);
+    trait.contents = content;
   }
 
   async function generateText() {
-    const context = contents || " ";
     setContents("...");
-    const response = await aiManager.generate(context, aiSystemPrompt);
 
     let newContent = "";
-    for await (const part of response) {
-      newContent += part.response;
+    for await (const part of trait.update()) {
+      newContent += part;
       setContents(newContent);
     }
-    handleContentsUpdate(newContent);
   }
 
   return (
     <div className="mb-4">
       <label htmlFor={id} className="block text-sm font-medium">
-        {label}
+        {trait.name}
       </label>
       <textarea
         id={id}

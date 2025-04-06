@@ -16,8 +16,12 @@ export default function Home() {
   const [generateAiManager, setGenerateAiManager] = useState<AiManager>(
     new AiManager(),
   );
-  const [aiCharacter] = useState<Character>(new Character("Agent"));
-  const [playerCharacter] = useState<Character>(new Character("Player"));
+  const [aiCharacter] = useState<Character>(
+    new Character("Agent", generateAiManager),
+  );
+  const [playerCharacter] = useState<Character>(
+    new Character("Player", generateAiManager),
+  );
 
   async function sendMessage(message: string) {
     const newMessage = chatAiManager.makeMessage(message, playerCharacter);
