@@ -2,14 +2,14 @@
 
 import React, { useState } from "react";
 import MessageHistory from "./messageHistory";
-import ChatMessage from "../ai/chatMessage";
+import ChatRoom from "../ai/chatRoom";
 
 interface ChatProps {
-  messages: ChatMessage[];
+  room: ChatRoom;
   sendMessage: (message: string) => Promise<void>;
 }
 
-export default function Chat({ messages, sendMessage }: ChatProps) {
+export default function Chat({ room, sendMessage }: ChatProps) {
   const [input, setInput] = useState("");
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -33,7 +33,7 @@ export default function Chat({ messages, sendMessage }: ChatProps) {
   return (
     <div>
       <div className="flex flex-col space-y-4">
-        <MessageHistory messages={messages} />
+        <MessageHistory room={room} />
       </div>
       <div className="flex flex-col space-y-4">
         <input

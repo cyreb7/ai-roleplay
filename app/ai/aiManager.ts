@@ -2,6 +2,7 @@ import ollama from "ollama/browser";
 import ChatMessage from "./chatMessage";
 import Character from "./character";
 import { AbortableAsyncIterator, GenerateResponse, Message } from "ollama";
+import ChatRoom from "./chatRoom";
 
 export interface AiModel {
   name: string;
@@ -16,7 +17,7 @@ export default class AiManager {
   }
 
   async sendMessage(
-    messageHistory: ChatMessage[],
+    room: ChatRoom,
     aiCharacter: Character,
   ): Promise<ChatMessage> {
     if (!this.model) {
@@ -24,8 +25,8 @@ export default class AiManager {
     }
 
     const messages = [
-      ...this.#getContextMessages(aiCharacter, messageHistory),
-      ...messageHistory.map((msg) => msg.message),
+      ...this.#getContextMessages(aiCharacter, room),
+      ...room.messages.map((msg) => msg.message),
     ];
 
     console.debug(messages);
@@ -66,22 +67,10 @@ export default class AiManager {
     );
   }
 
-  #getUniqueCharacters(messageHistory: ChatMessage[]): Set<Character> {
-    const characters = new Set<Character>();
-
-    for (const msg of messageHistory) {
-      characters.add(msg.character);
-    }
-
-    return characters;
-  }
-
-  #getContextMessages(
-    aiCharacter: Character,
-    messageHistory: ChatMessage[],
-  ): Message[] {
-    const historyCharacters = this.#getUniqueCharacters(messageHistory);
-    historyCharacters.delete(aiCharacter);
+  #getContextMessages(aiCharacter: Character, room: ChatRoom): Message[] {
+    const historyCharacters = room.participants.filter(
+      (character) => character !== aiCharacter,
+    );
 
     const contextMessages = [
       this.#getGeneralContextMessage(aiCharacter, historyCharacters),
@@ -97,7 +86,7 @@ export default class AiManager {
 
   #getGeneralContextMessage(
     aiCharacter: Character,
-    historyCharacters: Set<Character>,
+    historyCharacters: Character[],
   ): Message {
     let content = `You are ${aiCharacter.name}.`;
     const otherCharacterNames: string[] = [];
