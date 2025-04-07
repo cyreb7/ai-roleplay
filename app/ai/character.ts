@@ -1,8 +1,5 @@
 import AiManager from "./aiManager";
-import ChatRoom from "./chatRoom";
-import AutomaticCharacterContext from "./context/automaticCharacterContext";
-import Context from "./context/context";
-import ManualContext from "./context/manualContext";
+import Context from "./context";
 import { Message } from "ollama";
 
 export default class Character {
@@ -10,12 +7,10 @@ export default class Character {
   #traits: Context[] = [];
   #privateContext: Context[] = [];
 
-  constructor(name: string, aiManager: AiManager, room: ChatRoom) {
-    room.addParticipant(this);
-
+  constructor(name: string, aiManager: AiManager) {
     this.#name = name;
     this.#traits = [
-      new ManualContext(
+      new Context(
         "Description",
         aiManager,
         (): string =>
@@ -23,13 +18,11 @@ export default class Character {
       ),
     ];
     this.#privateContext = [
-      new AutomaticCharacterContext(
+      new Context(
         "Short Term Goals",
         aiManager,
         (): string =>
           `Look at the current character information and recent chat history, then write a list of short term goals for "${this.name}". Do not respond with anything except the goals.`,
-        this,
-        room,
       ),
     ];
   }
@@ -59,13 +52,11 @@ export default class Character {
     return context;
   }
 
-  getGeneralContextMessage(room: ChatRoom): Message {
+  getGeneralContextMessage(chatParticipants: Character[]): Message {
     let content = `You are ${this.name}.`;
     const otherCharacterNames: string[] = [];
 
-    for (const character of room.participants) {
-      if (character === this) continue;
-
+    for (const character of chatParticipants) {
       otherCharacterNames.push(character.name);
     }
 
@@ -79,10 +70,10 @@ export default class Character {
     };
   }
 
-  getContextMessages(room: ChatRoom): Message[] {
+  getContextMessages(chatParticipants: Character[]): Message[] {
     const contextMessages = [];
 
-    for (const character of room.participants) {
+    for (const character of [this, ...chatParticipants]) {
       contextMessages.push({ role: "system", content: character.context });
 
       if (character === this) {

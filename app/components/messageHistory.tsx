@@ -1,16 +1,16 @@
 import React from "react";
 import Message from "./message";
-import ChatRoom from "../ai/chatRoom";
+import ChatMessage from "../ai/chatMessage";
 
 interface MessageHistoryProps {
-  room: ChatRoom;
+  chatHistory: ChatMessage[];
 }
 
-export default function MessageHistory({ room }: MessageHistoryProps) {
+export default function MessageHistory({ chatHistory }: MessageHistoryProps) {
   return (
     <ol className="bg-blue p-4 rounded shadow-md divide-y divide-gray-200">
-      {room.messages.map((message, index) => (
-        <li key={index} className="py-3 flex items-center space-x-4">
+      {chatHistory.map((message) => (
+        <li key={message.id} className="py-3 flex items-center space-x-4">
           <Message message={message} />
         </li>
       ))}

@@ -5,11 +5,16 @@ export default class ChatMessage {
   #message: Message;
   #character: Character;
   #streaming: AsyncGenerator<ChatMessage, void, unknown> | null;
+  #id: string;
+  static #idCounter = 0;
 
   constructor(message: Message, character: Character) {
     this.#message = message;
     this.#character = character;
     this.#streaming = null;
+
+    ChatMessage.#idCounter++;
+    this.#id = ChatMessage.#idCounter.toString();
   }
 
   static makeFromStream(
@@ -51,5 +56,9 @@ export default class ChatMessage {
 
   get character(): Character {
     return this.#character;
+  }
+
+  get id(): string {
+    return this.#id;
   }
 }

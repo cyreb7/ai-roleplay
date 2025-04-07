@@ -3,7 +3,7 @@
 import React, { useState } from "react";
 import Character from "../ai/character";
 import AiManager from "../ai/aiManager";
-import Context from "../ai/context/context";
+import Context from "../ai/context";
 import ContextSettings from "./contextSettings";
 
 interface CharacterProps {

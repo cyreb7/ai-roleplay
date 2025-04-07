@@ -6,10 +6,9 @@ import AiManager, { AiModel } from "./ai/aiManager";
 import AiSettings from "./components/aiSettings";
 import CharacterSettings from "./components/characterSettings";
 import Character from "./ai/character";
-import ChatRoom from "./ai/chatRoom";
+import ChatMessage from "./ai/chatMessage";
 
 export default function Home() {
-  const [room, setRoom] = useState<ChatRoom>(new ChatRoom());
   const [chatAiManager, setChatAiManager] = useState<AiManager>(
     new AiManager(),
   );
@@ -17,18 +16,22 @@ export default function Home() {
     new AiManager(),
   );
   const [aiCharacter] = useState<Character>(
-    new Character("Agent", generateAiManager, room),
+    new Character("Agent", generateAiManager),
   );
   const [playerCharacter] = useState<Character>(
-    new Character("Player", generateAiManager, room),
+    new Character("Player", generateAiManager),
   );
+  const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 
   async function sendMessage(message: string) {
     const newMessage = chatAiManager.makeMessage(message, playerCharacter);
-    room.addMessage(newMessage);
-    const responseMessage = await chatAiManager.sendMessage(room, aiCharacter);
-    room.addMessage(responseMessage);
-    setRoom(room);
+    chatHistory.push(newMessage);
+    const responseMessage = await chatAiManager.sendMessage(
+      chatHistory,
+      [playerCharacter],
+      aiCharacter,
+    );
+    setChatHistory([...chatHistory, responseMessage]);
 
     aiCharacter.updateContext();
     playerCharacter.updateContext();
@@ -45,10 +48,10 @@ export default function Home() {
   }
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="grid items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
         <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <Chat room={room} sendMessage={sendMessage} />
+          <Chat chatHistory={chatHistory} sendMessage={sendMessage} />
         </div>
       </main>
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">

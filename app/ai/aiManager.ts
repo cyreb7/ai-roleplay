@@ -2,7 +2,6 @@ import ollama from "ollama/browser";
 import ChatMessage from "./chatMessage";
 import Character from "./character";
 import { AbortableAsyncIterator, GenerateResponse } from "ollama";
-import ChatRoom from "./chatRoom";
 
 export interface AiModel {
   name: string;
@@ -17,7 +16,8 @@ export default class AiManager {
   }
 
   async sendMessage(
-    room: ChatRoom,
+    chatHistory: ChatMessage[],
+    chatParticipants: Character[],
     aiCharacter: Character,
   ): Promise<ChatMessage> {
     if (!this.model) {
@@ -25,9 +25,9 @@ export default class AiManager {
     }
 
     const messages = [
-      aiCharacter.getGeneralContextMessage(room),
-      ...aiCharacter.getContextMessages(room),
-      ...room.messages.map((msg) => msg.message),
+      aiCharacter.getGeneralContextMessage(chatParticipants),
+      ...aiCharacter.getContextMessages(chatParticipants),
+      ...chatHistory.map((msg) => msg.message),
     ];
 
     console.debug(messages);
