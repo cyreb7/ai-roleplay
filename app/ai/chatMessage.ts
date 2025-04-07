@@ -18,7 +18,7 @@ export default class ChatMessage {
   }
 
   static makeFromStream(
-    newMessage: AbortableAsyncIterator<ChatResponse>,
+    newMessage: Promise<AbortableAsyncIterator<ChatResponse>>,
     character: Character,
   ): ChatMessage {
     const message = new ChatMessage({} as Message, character);
@@ -26,15 +26,18 @@ export default class ChatMessage {
     return message;
   }
 
-  streamMessage(newMessage: AbortableAsyncIterator<ChatResponse>): void {
+  streamMessage(
+    newMessage: Promise<AbortableAsyncIterator<ChatResponse>>,
+  ): void {
     this.#streaming = this.#makeStreamMessageGenerator(newMessage);
   }
 
   async *#makeStreamMessageGenerator(
-    newMessage: AbortableAsyncIterator<ChatResponse>,
+    newMessage: Promise<AbortableAsyncIterator<ChatResponse>>,
   ): AsyncGenerator<ChatMessage, void, unknown> {
+    const response = await newMessage;
     let content = "";
-    for await (const part of newMessage) {
+    for await (const part of response) {
       content += part.message.content;
       part.message.content = content;
       this.#message = part.message;

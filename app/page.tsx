@@ -23,10 +23,10 @@ export default function Home() {
   );
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 
-  async function sendMessage(message: string) {
+  function sendMessage(message: string) {
     const newMessage = chatAiManager.makeMessage(message, playerCharacter);
     chatHistory.push(newMessage);
-    const responseMessage = await chatAiManager.sendMessage(
+    const responseMessage = chatAiManager.sendMessage(
       chatHistory,
       [playerCharacter],
       aiCharacter,

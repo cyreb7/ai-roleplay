@@ -18,11 +18,11 @@ export default class AiManager {
     return response.models.map((model) => ({ name: model.name }));
   }
 
-  async sendMessage(
+  sendMessage(
     chatHistory: ChatMessage[],
     chatParticipants: Character[],
     aiCharacter: Character,
-  ): Promise<ChatMessage> {
+  ): ChatMessage {
     if (!this.model) {
       throw new Error("No model selected");
     }
@@ -35,7 +35,7 @@ export default class AiManager {
 
     console.debug(messages);
 
-    const response = await ollama.chat({
+    const response = ollama.chat({
       ...AiManager.defaultSettings,
       stream: true,
       model: this.model.name,

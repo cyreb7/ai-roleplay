@@ -6,7 +6,7 @@ import ChatMessage from "../ai/chatMessage";
 
 interface ChatProps {
   chatHistory: ChatMessage[];
-  sendMessage: (message: string) => Promise<void>;
+  sendMessage: (message: string) => void;
 }
 
 export default function Chat({ chatHistory, sendMessage }: ChatProps) {

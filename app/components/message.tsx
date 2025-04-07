@@ -6,7 +6,9 @@ interface MessageyProps {
 }
 
 export default function Message({ message }: MessageyProps) {
-  const [messageContent, setInput] = useState(message.content);
+  const [messageContent, setInput] = useState(
+    message.done ? "..." : message.content,
+  );
 
   useEffect(() => {
     awaitMessageDone();
