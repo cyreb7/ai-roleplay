@@ -48,7 +48,7 @@ export default function AiSettings({
           className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         >
           {avalibleModels.map((model) => (
-            <option key={model.name} value={model.name}>
+            <option key={model.name} value={model.name} className="text-black">
               {model.name}
             </option>
           ))}

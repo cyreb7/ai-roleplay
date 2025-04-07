@@ -26,6 +26,12 @@ export default function ContextSettings({ trait }: ContextProps) {
     }
   }
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      generateText();
+    }
+  };
+
   return (
     <div className="mb-4">
       <label htmlFor={id} className="block text-sm font-medium">
@@ -35,10 +41,11 @@ export default function ContextSettings({ trait }: ContextProps) {
         id={id}
         value={contents}
         onChange={(e) => handleContentsChange(e.target.value)}
+        onKeyDown={handleKeyPress}
         className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
       ></textarea>
       <button
-        className="bg-blue-500 text-white px-4 py-2 rounded mr-2"
+        className="mt-1 bg-blue-500 text-white px-4 py-2 rounded mr-2"
         onClick={generateText}
       >
         Generate

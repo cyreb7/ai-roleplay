@@ -9,6 +9,9 @@ export interface AiModel {
 
 export default class AiManager {
   model: AiModel | null = null;
+  static defaultSettings: object = {
+    keep_alive: 60 * 60, // 1 hour
+  };
 
   async getAllModesl(): Promise<AiModel[]> {
     const response = await ollama.list();
@@ -33,8 +36,9 @@ export default class AiManager {
     console.debug(messages);
 
     const response = await ollama.chat({
-      model: this.model.name,
+      ...AiManager.defaultSettings,
       stream: true,
+      model: this.model.name,
       messages: messages,
     });
 
@@ -51,8 +55,9 @@ export default class AiManager {
     console.debug(system, prompt);
 
     return ollama.generate({
-      model: this.model.name,
+      ...AiManager.defaultSettings,
       stream: true,
+      model: this.model.name,
       prompt,
       system,
     });

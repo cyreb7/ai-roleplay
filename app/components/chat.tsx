@@ -31,7 +31,7 @@ export default function Chat({ chatHistory, sendMessage }: ChatProps) {
   };
 
   return (
-    <div>
+    <div className="w-xl text-justify text-pretty hyphens-auto">
       <div className="flex flex-col space-y-4">
         <MessageHistory chatHistory={chatHistory} />
       </div>
