@@ -1,6 +1,10 @@
 import ollama from "ollama/browser";
 import ChatMessage from "./chatMessage";
-import Character from "./character";
+import {
+  Character,
+  getGeneralContextMessage,
+  getContextMessages,
+} from "./character";
 import { AbortableAsyncIterator, GenerateResponse } from "ollama";
 
 export interface AiModel {
@@ -28,8 +32,8 @@ export default class AiManager {
     }
 
     const messages = [
-      aiCharacter.getGeneralContextMessage(chatParticipants),
-      ...aiCharacter.getContextMessages(chatParticipants),
+      getGeneralContextMessage(aiCharacter, chatParticipants),
+      ...getContextMessages(aiCharacter, chatParticipants),
       ...chatHistory.map((msg) => msg.message),
     ];
 
@@ -58,7 +62,7 @@ export default class AiManager {
       ...AiManager.defaultSettings,
       stream: true,
       model: this.model.name,
-      prompt,
+      prompt: prompt || " ", // LLMs don't do anything with an empty prompt
       system,
     });
   }

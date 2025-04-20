@@ -1,37 +1,50 @@
 import AiManager from "./aiManager";
+import { Character } from "./character";
 
-export default class Context {
-  #name: string;
-  #aiManager: AiManager;
-  getAiSystemPrompt: () => string;
-  contents: string = "";
+export interface Context {
+  name: string;
+  getAiSystemPrompt: GetContextFunction;
+  contents: string;
+}
 
-  constructor(
-    name: string,
-    aiManager: AiManager,
-    getAiSystemPrompt: () => string,
-  ) {
-    this.#name = name;
-    this.#aiManager = aiManager;
-    this.getAiSystemPrompt = getAiSystemPrompt;
+export interface GetContextFunction {
+  (character: Character): string;
+}
+
+export async function* update(
+  context: Context,
+  prompt: string,
+  aiManager: AiManager,
+  character: Character,
+): AsyncGenerator<string> {
+  const response = await aiManager.generate(
+    prompt,
+    context.getAiSystemPrompt(character),
+  );
+
+  let contents = "";
+  for await (const part of response) {
+    contents += part.response;
+    yield part.response;
   }
 
-  async *update(prompt: string | null = null): AsyncGenerator<string> {
-    const response = await this.#aiManager.generate(
-      prompt ?? this.contents,
-      this.getAiSystemPrompt(),
-    );
+  return contents;
+}
 
-    this.contents = "";
-    for await (const part of response) {
-      this.contents += part.response;
-      yield part.response;
-    }
+export function makeDescription(): Context {
+  return {
+    name: "Description",
+    getAiSystemPrompt: (character: Character): string =>
+      `Write a detailed description for a character named "${character.name}". Do not respond with anything except the descripion.`,
+    contents: "",
+  };
+}
 
-    return;
-  }
-
-  get name(): string {
-    return this.#name;
-  }
+export function makeShortTermGoals(): Context {
+  return {
+    name: "Short Term Goals",
+    getAiSystemPrompt: (character: Character): string =>
+      `Look at the current character information and recent chat history, then write a list of short term goals for "${character.name}". Do not respond with anything except the goals.`,
+    contents: "",
+  };
 }

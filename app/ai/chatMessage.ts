@@ -1,5 +1,5 @@
 import { AbortableAsyncIterator, ChatResponse, Message } from "ollama";
-import Character from "./character";
+import { Character } from "./character";
 
 export default class ChatMessage {
   #message: Message;

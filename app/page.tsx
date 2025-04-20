@@ -5,8 +5,9 @@ import Chat from "./components/chat";
 import AiManager, { AiModel } from "./ai/aiManager";
 import AiSettings from "./components/aiSettings";
 import CharacterSettings from "./components/characterSettings";
-import Character from "./ai/character";
 import ChatMessage from "./ai/chatMessage";
+import { Character } from "./ai/character";
+import { makeDescription, makeShortTermGoals } from "./ai/context";
 
 export default function Home() {
   const [chatAiManager, setChatAiManager] = useState<AiManager>(
@@ -15,12 +16,16 @@ export default function Home() {
   const [generateAiManager, setGenerateAiManager] = useState<AiManager>(
     new AiManager(),
   );
-  const [aiCharacter] = useState<Character>(
-    new Character("Agent", generateAiManager),
-  );
-  const [playerCharacter] = useState<Character>(
-    new Character("Player", generateAiManager),
-  );
+  const [aiCharacter, setAiCharacter] = useState<Character>({
+    name: "Agent",
+    publicContext: [makeDescription()],
+    privateContext: [makeShortTermGoals()],
+  });
+  const [playerCharacter, setPlayerCharacter] = useState<Character>({
+    name: "Player",
+    publicContext: [makeDescription()],
+    privateContext: [],
+  });
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 
   function sendMessage(message: string) {
@@ -32,9 +37,6 @@ export default function Home() {
       aiCharacter,
     );
     setChatHistory([...chatHistory, responseMessage]);
-
-    aiCharacter.updateContext();
-    playerCharacter.updateContext();
   }
 
   function updateChatModel(model: AiModel) {
@@ -57,13 +59,61 @@ export default function Home() {
       <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
         <CharacterSettings
           title="AI Settings"
-          character={aiCharacter}
-          aiManager={generateAiManager}
+          characterName={aiCharacter.name}
+          characterTraits={[
+            ...aiCharacter.publicContext,
+            ...aiCharacter.privateContext,
+          ]}
+          onNameChange={function (name) {
+            aiCharacter.name = name;
+            setAiCharacter({ ...aiCharacter });
+          }}
+          onNewContents={(context, newContents) => {
+            context.contents = newContents;
+            setAiCharacter({ ...aiCharacter });
+          }}
+          onGenerateContents={async (context) => {
+            const response = await generateAiManager.generate(
+              context.contents,
+              context.getAiSystemPrompt(aiCharacter),
+            );
+
+            context.contents = "";
+            for await (const part of response) {
+              context.contents += part.response;
+            }
+
+            setAiCharacter({ ...aiCharacter });
+          }}
         />
         <CharacterSettings
           title="Player Settings"
-          character={playerCharacter}
-          aiManager={generateAiManager}
+          characterName={playerCharacter.name}
+          characterTraits={[
+            ...playerCharacter.publicContext,
+            ...playerCharacter.privateContext,
+          ]}
+          onNameChange={function (name) {
+            playerCharacter.name = name;
+            setPlayerCharacter({ ...playerCharacter });
+          }}
+          onNewContents={(context, newContents) => {
+            context.contents = newContents;
+            setPlayerCharacter({ ...playerCharacter });
+          }}
+          onGenerateContents={async (context) => {
+            const response = await generateAiManager.generate(
+              context.contents,
+              context.getAiSystemPrompt(playerCharacter),
+            );
+
+            context.contents = "";
+            for await (const part of response) {
+              context.contents += part.response;
+            }
+
+            setPlayerCharacter({ ...playerCharacter });
+          }}
         />
         <AiSettings
           title="Chat AI Settings"
