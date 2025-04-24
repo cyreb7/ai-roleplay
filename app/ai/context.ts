@@ -5,6 +5,7 @@ export interface Context {
   name: string;
   getAiSystemPrompt: GetContextFunction;
   contents: string;
+  generating: boolean;
 }
 
 export interface GetContextFunction {
@@ -37,6 +38,7 @@ export function makeDescription(): Context {
     getAiSystemPrompt: (character: Character): string =>
       `Write a detailed description for a character named "${character.name}". Do not respond with anything except the descripion.`,
     contents: "",
+    generating: false,
   };
 }
 
@@ -46,5 +48,6 @@ export function makeShortTermGoals(): Context {
     getAiSystemPrompt: (character: Character): string =>
       `Look at the current character information and recent chat history, then write a list of short term goals for "${character.name}". Do not respond with anything except the goals.`,
     contents: "",
+    generating: false,
   };
 }

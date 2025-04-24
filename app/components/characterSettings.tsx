@@ -42,6 +42,7 @@ export default function CharacterSettings({
           key={trait.name}
           title={trait.name}
           contents={trait.contents}
+          generating={trait.generating}
           onGenerate={() => onGenerateContents(trait)}
           onNewContents={(contents) => onNewContents(trait, contents)}
         />

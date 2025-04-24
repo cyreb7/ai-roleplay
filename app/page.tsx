@@ -7,7 +7,7 @@ import AiSettings from "./components/aiSettings";
 import CharacterSettings from "./components/characterSettings";
 import ChatMessage from "./ai/chatMessage";
 import { Character } from "./ai/character";
-import { makeDescription, makeShortTermGoals } from "./ai/context";
+import { Context, makeDescription, makeShortTermGoals } from "./ai/context";
 
 export default function Home() {
   const [chatAiManager, setChatAiManager] = useState<AiManager>(
@@ -49,6 +49,29 @@ export default function Home() {
     setGenerateAiManager(generateAiManager);
   }
 
+  async function generate(
+    context: Context,
+    character: Character,
+    setCharacter: (character: Character) => void,
+  ) {
+    context.generating = true;
+    setCharacter({ ...character });
+
+    const response = await generateAiManager.generate(
+      context.contents,
+      context.getAiSystemPrompt(character),
+    );
+
+    context.contents = "";
+    for await (const part of response) {
+      context.contents += part.response;
+      setCharacter({ ...character });
+    }
+
+    context.generating = false;
+    setCharacter({ ...character });
+  }
+
   return (
     <div className="grid items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
@@ -72,19 +95,9 @@ export default function Home() {
             context.contents = newContents;
             setAiCharacter({ ...aiCharacter });
           }}
-          onGenerateContents={async (context) => {
-            const response = await generateAiManager.generate(
-              context.contents,
-              context.getAiSystemPrompt(aiCharacter),
-            );
-
-            context.contents = "";
-            for await (const part of response) {
-              context.contents += part.response;
-            }
-
-            setAiCharacter({ ...aiCharacter });
-          }}
+          onGenerateContents={(context) =>
+            generate(context, aiCharacter, setAiCharacter)
+          }
         />
         <CharacterSettings
           title="Player Settings"
@@ -101,19 +114,9 @@ export default function Home() {
             context.contents = newContents;
             setPlayerCharacter({ ...playerCharacter });
           }}
-          onGenerateContents={async (context) => {
-            const response = await generateAiManager.generate(
-              context.contents,
-              context.getAiSystemPrompt(playerCharacter),
-            );
-
-            context.contents = "";
-            for await (const part of response) {
-              context.contents += part.response;
-            }
-
-            setPlayerCharacter({ ...playerCharacter });
-          }}
+          onGenerateContents={(context) =>
+            generate(context, playerCharacter, setPlayerCharacter)
+          }
         />
         <AiSettings
           title="Chat AI Settings"
