@@ -5,7 +5,7 @@ import {
   getGeneralContextMessage,
   getContextMessages,
 } from "./character";
-import { AbortableAsyncIterator, GenerateResponse } from "ollama";
+import { AbortableAsyncIterator, GenerateResponse, ChatResponse } from "ollama";
 
 export interface AiModel {
   name: string;
@@ -26,7 +26,7 @@ export default class AiManager {
     chatHistory: ChatMessage[],
     chatParticipants: Character[],
     aiCharacter: Character,
-  ): ChatMessage {
+  ): Promise<AbortableAsyncIterator<ChatResponse>> {
     if (!this.model) {
       throw new Error("No model selected");
     }
@@ -39,14 +39,12 @@ export default class AiManager {
 
     console.debug(messages);
 
-    const response = ollama.chat({
+    return ollama.chat({
       ...AiManager.defaultSettings,
       stream: true,
       model: this.model.name,
       messages: messages,
     });
-
-    return ChatMessage.makeFromStream(response, aiCharacter);
   }
 
   generate(
@@ -65,15 +63,5 @@ export default class AiManager {
       prompt: prompt || " ", // LLMs don't do anything with an empty prompt
       system,
     });
-  }
-
-  makeMessage(messageContent: string, character: Character): ChatMessage {
-    return new ChatMessage(
-      {
-        role: "user",
-        content: messageContent,
-      },
-      character,
-    );
   }
 }

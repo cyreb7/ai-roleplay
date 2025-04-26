@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import ChatMessage from "../ai/chatMessage";
 
 interface MessageyProps {
@@ -6,23 +6,15 @@ interface MessageyProps {
 }
 
 export default function Message({ message }: MessageyProps) {
-  const [messageContent, setInput] = useState(
-    message.done ? "..." : message.content,
-  );
+  function getContents(): string {
+    let contents = message.message.content;
 
-  useEffect(() => {
-    awaitMessageDone();
-  }, [message]);
-
-  async function awaitMessageDone(): Promise<void> {
-    if (!message.done) {
-      return;
+    if (message.generating) {
+      contents += "…";
     }
 
-    for await (const part of message.done) {
-      setInput(part.content);
-    }
+    return contents;
   }
 
-  return <div>{messageContent}</div>;
+  return <div>{getContents()}</div>;
 }

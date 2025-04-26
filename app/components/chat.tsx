@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import MessageHistory from "./messageHistory";
 import ChatMessage from "../ai/chatMessage";
+import GeneratingButton from "./generatingButton";
 
 interface ChatProps {
   chatHistory: ChatMessage[];
@@ -11,6 +12,7 @@ interface ChatProps {
 
 export default function Chat({ chatHistory, sendMessage }: ChatProps) {
   const [input, setInput] = useState("");
+  const isGenerating = chatHistory.some((message) => message.generating);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInput(e.target.value);
@@ -43,13 +45,11 @@ export default function Chat({ chatHistory, sendMessage }: ChatProps) {
           onKeyDown={handleKeyPress}
           className="p-2 border rounded"
           placeholder="Type a message..."
+          disabled={isGenerating}
         />
-        <button
-          onClick={handleSendMessage}
-          className="bg-blue-500 text-white p-2 rounded hover:bg-blue-700"
-        >
+        <GeneratingButton onClick={handleSendMessage} generating={isGenerating}>
           Send
-        </button>
+        </GeneratingButton>
       </div>
     </div>
   );

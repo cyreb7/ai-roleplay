@@ -8,6 +8,7 @@ import CharacterSettings from "./components/characterSettings";
 import ChatMessage from "./ai/chatMessage";
 import { Character } from "./ai/character";
 import { Context, makeDescription, makeShortTermGoals } from "./ai/context";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Home() {
   const [chatAiManager, setChatAiManager] = useState<AiManager>(
@@ -28,15 +29,45 @@ export default function Home() {
   });
   const [chatHistory, setChatHistory] = useState<ChatMessage[]>([]);
 
-  function sendMessage(message: string) {
-    const newMessage = chatAiManager.makeMessage(message, playerCharacter);
-    chatHistory.push(newMessage);
-    const responseMessage = chatAiManager.sendMessage(
+  async function sendMessage(playerMessageContent: string) {
+    const thisChatHistory = chatHistory;
+    const newPlayerMessage: ChatMessage = {
+      message: {
+        role: "user",
+        content: playerMessageContent,
+      },
+      character: playerCharacter,
+      generating: false,
+      id: uuidv4(),
+    };
+
+    thisChatHistory.push(newPlayerMessage);
+
+    const newAiMessage = {
+      message: {
+        role: "assistant",
+        content: "",
+      },
+      character: aiCharacter,
+      generating: true,
+      id: uuidv4(),
+    };
+
+    setChatHistory([...thisChatHistory, newAiMessage]);
+
+    const response = await chatAiManager.sendMessage(
       chatHistory,
       [playerCharacter],
       aiCharacter,
     );
-    setChatHistory([...chatHistory, responseMessage]);
+
+    for await (const part of response) {
+      newAiMessage.message.content += part.message.content;
+      setChatHistory([...thisChatHistory, newAiMessage]);
+    }
+
+    newAiMessage.generating = false;
+    setChatHistory([...thisChatHistory, newAiMessage]);
   }
 
   function updateChatModel(model: AiModel) {
@@ -49,7 +80,7 @@ export default function Home() {
     setGenerateAiManager(generateAiManager);
   }
 
-  async function generate(
+  async function generateCharacter(
     context: Context,
     character: Character,
     setCharacter: (character: Character) => void,
@@ -96,7 +127,7 @@ export default function Home() {
             setAiCharacter({ ...aiCharacter });
           }}
           onGenerateContents={(context) =>
-            generate(context, aiCharacter, setAiCharacter)
+            generateCharacter(context, aiCharacter, setAiCharacter)
           }
         />
         <CharacterSettings
@@ -115,7 +146,7 @@ export default function Home() {
             setPlayerCharacter({ ...playerCharacter });
           }}
           onGenerateContents={(context) =>
-            generate(context, playerCharacter, setPlayerCharacter)
+            generateCharacter(context, playerCharacter, setPlayerCharacter)
           }
         />
         <AiSettings
