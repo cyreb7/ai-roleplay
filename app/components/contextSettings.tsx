@@ -46,6 +46,7 @@ export default function ContextSettings({
         onKeyDown={handleKeyPress}
         className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         disabled={generating}
+        placeholder="Prompt or context..."
       ></textarea>
       <GeneratingButton onClick={onGenerate} generating={generating}>
         Generate

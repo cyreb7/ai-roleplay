@@ -44,7 +44,7 @@ export default function Chat({ chatHistory, sendMessage }: ChatProps) {
           onChange={handleInputChange}
           onKeyDown={handleKeyPress}
           className="p-2 border rounded"
-          placeholder="Type a message..."
+          placeholder="Message..."
           disabled={isGenerating}
         />
         <GeneratingButton onClick={handleSendMessage} generating={isGenerating}>
