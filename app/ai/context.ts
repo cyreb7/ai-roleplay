@@ -1,35 +1,20 @@
-import AiManager from "./aiManager";
-import { Character } from "./character";
+import { Character, getContext } from "./character";
+import ChatMessage, { getAiGenerateContext } from "./chatMessage";
 
 export interface Context {
   name: string;
-  getAiSystemPrompt: GetContextFunction;
+  getAiSystemPrompt: GetContextSystemPromptFunction;
+  getGenerateOnNewMessageUserPrompt: GetContextUserPromptFunction | null;
   contents: string;
   generating: boolean;
 }
 
-export interface GetContextFunction {
-  (character: Character): string;
+export interface GetContextSystemPromptFunction {
+  (thisCharacter: Character): string;
 }
 
-export async function* update(
-  context: Context,
-  prompt: string,
-  aiManager: AiManager,
-  character: Character,
-): AsyncGenerator<string> {
-  const response = await aiManager.generate(
-    prompt,
-    context.getAiSystemPrompt(character),
-  );
-
-  let contents = "";
-  for await (const part of response) {
-    contents += part.response;
-    yield part.response;
-  }
-
-  return contents;
+export interface GetContextUserPromptFunction {
+  (chatLog: ChatMessage[]): string;
 }
 
 export function makeDescription(): Context {
@@ -39,14 +24,19 @@ export function makeDescription(): Context {
       `Write a detailed description for a character named "${character.name}". Do not respond with anything except the descripion.`,
     contents: "",
     generating: false,
+    getGenerateOnNewMessageUserPrompt: null,
   };
 }
 
 export function makeShortTermGoals(): Context {
+  const name = "Short Term Goals";
+
   return {
-    name: "Short Term Goals",
+    name,
     getAiSystemPrompt: (character: Character): string =>
-      `Look at the current character information and recent chat history, then write a list of short term goals for "${character.name}". Do not respond with anything except the goals.`,
+      `Write a list of short term goals for "${character.name}". Do not respond with anything except the goals\n\nCharacter Information:\n${getContext(character)}.`,
+    getGenerateOnNewMessageUserPrompt: (chatLog: ChatMessage[]): string =>
+      `Recent Chat History:\n${getAiGenerateContext(chatLog)}`,
     contents: "",
     generating: false,
   };

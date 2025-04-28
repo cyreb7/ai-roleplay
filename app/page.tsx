@@ -68,6 +68,9 @@ export default function Home() {
 
     newAiMessage.generating = false;
     setChatHistory([...thisChatHistory, newAiMessage]);
+
+    generateContextOnNewMessage(aiCharacter, setAiCharacter);
+    generateContextOnNewMessage(playerCharacter, setPlayerCharacter);
   }
 
   function updateChatModel(model: AiModel) {
@@ -80,7 +83,21 @@ export default function Home() {
     setGenerateAiManager(generateAiManager);
   }
 
-  async function generateCharacter(
+  async function generateContextOnNewMessage(
+    character: Character,
+    setCharacter: (character: Character) => void,
+  ) {
+    for (const context of [
+      ...character.privateContext,
+      ...character.publicContext,
+    ].filter((context) => context.getGenerateOnNewMessageUserPrompt !== null)) {
+      const prompt = context.getGenerateOnNewMessageUserPrompt!(chatHistory);
+      generateContext(prompt, context, character, setCharacter);
+    }
+  }
+
+  async function generateContext(
+    prompt: string,
     context: Context,
     character: Character,
     setCharacter: (character: Character) => void,
@@ -89,7 +106,7 @@ export default function Home() {
     setCharacter({ ...character });
 
     const response = await generateAiManager.generate(
-      context.contents,
+      prompt,
       context.getAiSystemPrompt(character),
     );
 
@@ -127,7 +144,12 @@ export default function Home() {
             setAiCharacter({ ...aiCharacter });
           }}
           onGenerateContents={(context) =>
-            generateCharacter(context, aiCharacter, setAiCharacter)
+            generateContext(
+              context.contents,
+              context,
+              aiCharacter,
+              setAiCharacter,
+            )
           }
         />
         <CharacterSettings
@@ -146,7 +168,12 @@ export default function Home() {
             setPlayerCharacter({ ...playerCharacter });
           }}
           onGenerateContents={(context) =>
-            generateCharacter(context, playerCharacter, setPlayerCharacter)
+            generateContext(
+              context.contents,
+              context,
+              playerCharacter,
+              setPlayerCharacter,
+            )
           }
         />
         <AiSettings

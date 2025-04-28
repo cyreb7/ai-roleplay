@@ -8,7 +8,7 @@ export interface Character {
 }
 
 export function getContext(character: Character): string {
-  let context = `Name:\n${character.name}.`;
+  let context = `Name:\n${character.name}`;
 
   for (const trait of [
     ...character.publicContext,
