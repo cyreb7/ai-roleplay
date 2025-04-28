@@ -37,7 +37,7 @@ export default class AiManager {
       ...chatHistory.map((msg) => msg.message),
     ];
 
-    console.debug(messages);
+    console.debug("Generating message...", messages);
 
     return ollama.chat({
       ...AiManager.defaultSettings,
@@ -54,7 +54,7 @@ export default class AiManager {
     if (!this.model) {
       throw new Error("No model selected");
     }
-    console.debug(system, prompt);
+    console.debug("Generating prompt...", { system, prompt });
 
     return ollama.generate({
       ...AiManager.defaultSettings,

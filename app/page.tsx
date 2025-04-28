@@ -7,7 +7,12 @@ import AiSettings from "./components/aiSettings";
 import CharacterSettings from "./components/characterSettings";
 import ChatMessage from "./ai/chatMessage";
 import { Character } from "./ai/character";
-import { Context, makeDescription, makeShortTermGoals } from "./ai/context";
+import {
+  Context,
+  makeDescription,
+  makeLongTermGoals,
+  makeShortTermGoals,
+} from "./ai/context";
 import { v4 as uuidv4 } from "uuid";
 
 export default function Home() {
@@ -20,7 +25,7 @@ export default function Home() {
   const [aiCharacter, setAiCharacter] = useState<Character>({
     name: "Agent",
     publicContext: [makeDescription()],
-    privateContext: [makeShortTermGoals()],
+    privateContext: [makeShortTermGoals(), makeLongTermGoals()],
   });
   const [playerCharacter, setPlayerCharacter] = useState<Character>({
     name: "Player",
@@ -61,10 +66,13 @@ export default function Home() {
       aiCharacter,
     );
 
+    let lastPart;
     for await (const part of response) {
+      lastPart = part;
       newAiMessage.message.content += part.message.content;
       setChatHistory([...thisChatHistory, newAiMessage]);
     }
+    console.debug("Finished generating message", lastPart);
 
     newAiMessage.generating = false;
     setChatHistory([...thisChatHistory, newAiMessage]);
@@ -111,10 +119,16 @@ export default function Home() {
     );
 
     context.contents = "";
+    let lastPart;
     for await (const part of response) {
+      lastPart = part;
       context.contents += part.response;
       setCharacter({ ...character });
     }
+    console.debug("Finished generating context", {
+      ...lastPart,
+      response: context.contents,
+    });
 
     context.generating = false;
     setCharacter({ ...character });
