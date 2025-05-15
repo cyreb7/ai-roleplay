@@ -14,6 +14,7 @@ export default function AiSettings({
   aiManager,
   updateModel,
 }: AiManagerProps) {
+  const DEFAULT_MODEL = "gemma3:4b";
   const [avalibleModels, setAvalibleModels] = useState<AiModel[]>([
     { name: "Loading..." } as AiModel,
   ]);
@@ -28,7 +29,10 @@ export default function AiSettings({
   async function updateModels() {
     const models = await aiManager.getAllModesl();
     setAvalibleModels(models);
-    handleModelChange(models[0].name);
+
+    const defaultModel =
+      models.find((m) => m.name === DEFAULT_MODEL) ?? models[0];
+    handleModelChange(defaultModel.name);
   }
 
   function handleModelChange(modelName: string) {
