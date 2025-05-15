@@ -29,14 +29,24 @@ export function makeDescription(): Context {
 }
 
 export function makeShortTermGoals(): Context {
-  const name = "Short Term Goals";
-
   return {
-    name,
+    name: "Short Term Goals",
     getAiSystemPrompt: (character: Character): string =>
-      `Write a list of short term goals for "${character.name}". Do not respond with anything except the goals\n\nCharacter Information:\n${getContext(character)}.`,
+      `Write a list of short term goals for "${character.name}" using the provided context. Do not respond with anything except the goals.\n\nCharacter Information:\n${getContext(character)}\n\nYou will be given recent chat history for context.`,
     getGenerateOnNewMessageUserPrompt: (chatLog: ChatMessage[]): string =>
-      `Recent Chat History:\n${getAiGenerateContext(chatLog)}`,
+      getAiGenerateContext(chatLog),
+    contents: "",
+    generating: false,
+  };
+}
+
+export function makeLongTermGoals(): Context {
+  return {
+    name: "Long Term Goals",
+    getAiSystemPrompt: (character: Character): string =>
+      `Write a list of long term goals for "${character.name}" using the provided context. Do not respond with anything except the goals.\n\nCharacter Information:\n${getContext(character)}\n\nYou will be given recent chat history for context.`,
+    getGenerateOnNewMessageUserPrompt: (chatLog: ChatMessage[]): string =>
+      getAiGenerateContext(chatLog),
     contents: "",
     generating: false,
   };
