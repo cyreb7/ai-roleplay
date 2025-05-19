@@ -19,6 +19,7 @@ export default class AiManager {
 
   async getAllModesl(): Promise<AiModel[]> {
     const response = await ollama.list();
+    console.debug("Models", response);
     return response.models.map((model) => ({ name: model.name }));
   }
 
@@ -32,9 +33,12 @@ export default class AiManager {
     }
 
     const messages = [
-      getGeneralContextMessage(aiCharacter, chatParticipants),
+      ...chatHistory
+        .slice(0, -1)
+        .map((msg) => getAiGenerateMessage(aiCharacter, msg)),
       ...getContextMessages(aiCharacter, chatParticipants),
-      ...chatHistory.map((msg) => getAiGenerateMessage(msg)),
+      getGeneralContextMessage(aiCharacter, chatParticipants),
+      getAiGenerateMessage(aiCharacter, chatHistory[chatHistory.length - 1]),
     ];
 
     console.debug("Generating message...", messages);

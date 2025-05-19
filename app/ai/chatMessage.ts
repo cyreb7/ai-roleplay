@@ -12,10 +12,16 @@ export function getAiGenerateContext(chatLog: ChatMessage[]): string {
   return chatLog.map(getAiGenerateString).join("\n\n");
 }
 
-export function getAiGenerateMessage(message: ChatMessage): Message {
+export function getAiGenerateMessage(
+  character: Character,
+  message: ChatMessage,
+): Message {
   return {
     ...message.message,
-    content: getAiGenerateString(message),
+    content:
+      character.name === message.character.name
+        ? message.message.content
+        : getAiGenerateString(message),
   };
 }
 
