@@ -60,6 +60,7 @@ export default function Home() {
 
     setChatHistory([...thisChatHistory, newAiMessage]);
 
+    try {
     const response = await chatAiManager.sendMessage(
       chatHistory,
       [playerCharacter],
@@ -73,9 +74,12 @@ export default function Home() {
       setChatHistory([...thisChatHistory, newAiMessage]);
     }
     console.debug("Finished generating message", lastPart);
-
     newAiMessage.generating = false;
     setChatHistory([...thisChatHistory, newAiMessage]);
+    } catch (e) {
+      setChatHistory([...thisChatHistory]);
+      throw e;
+    }
 
     generateContextOnNewMessage(aiCharacter, setAiCharacter);
     generateContextOnNewMessage(playerCharacter, setPlayerCharacter);
@@ -110,9 +114,11 @@ export default function Home() {
     character: Character,
     setCharacter: (character: Character) => void,
   ) {
+    const originalContents = context.contents;
     context.generating = true;
     setCharacter({ ...character });
 
+    try {
     const response = await generateAiManager.generate(
       prompt,
       context.getAiSystemPrompt(character),
@@ -129,9 +135,13 @@ export default function Home() {
       ...lastPart,
       response: context.contents,
     });
-
+    } catch (error) {
+      context.contents = originalContents;
+      throw error;
+    } finally {
     context.generating = false;
     setCharacter({ ...character });
+    }
   }
 
   return (
