@@ -1,5 +1,5 @@
 import ollama from "ollama/browser";
-import ChatMessage from "./chatMessage";
+import ChatMessage, { getAiGenerateMessage } from "./chatMessage";
 import {
   Character,
   getGeneralContextMessage,
@@ -34,7 +34,7 @@ export default class AiManager {
     const messages = [
       getGeneralContextMessage(aiCharacter, chatParticipants),
       ...getContextMessages(aiCharacter, chatParticipants),
-      ...chatHistory.map((msg) => msg.message),
+      ...chatHistory.map((msg) => getAiGenerateMessage(msg)),
     ];
 
     console.debug("Generating message...", messages);

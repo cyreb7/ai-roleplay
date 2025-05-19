@@ -8,15 +8,14 @@ export interface Character {
 }
 
 export function getContext(character: Character): string {
-  let context = `Name:\n${character.name}`;
+  let context = `Character Information for "${character.name}":`;
 
   for (const trait of [
     ...character.publicContext,
     ...character.privateContext,
   ]) {
-    const traitContext = trait.contents;
-    if (traitContext) {
-      context += `\n\n${trait.name}:\n${traitContext}`;
+    if (trait.contents) {
+      context += `\n\n${getTraitContext(trait)}`;
     }
   }
 
@@ -54,15 +53,23 @@ export function getContextMessages(
     contextMessages.push({ role: "system", content: getContext(character) });
 
     if (character === thisCharacter) {
-      contextMessages.push({
+      const message = {
         role: "system",
         content: thisCharacter.privateContext
           .filter((trait) => trait.contents !== "")
-          .map((trait) => `${trait.name}:\n${trait.contents}`)
+          .map(getTraitContext)
           .join("\n\n"),
-      });
+      };
+
+      if (message.content) {
+        contextMessages.push();
+      }
     }
   }
 
   return contextMessages;
+}
+
+function getTraitContext(context: Context): string {
+  return `${context.name}:\n${context.contents}`;
 }

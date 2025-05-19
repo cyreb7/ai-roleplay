@@ -9,7 +9,16 @@ export default interface ChatMessage {
 }
 
 export function getAiGenerateContext(chatLog: ChatMessage[]): string {
-  return chatLog
-    .map((message) => `${message.character.name}: ${message.message.content}`)
-    .join("\n\n");
+  return chatLog.map(getAiGenerateString).join("\n\n");
+}
+
+export function getAiGenerateMessage(message: ChatMessage): Message {
+  return {
+    ...message.message,
+    content: getAiGenerateString(message),
+  };
+}
+
+function getAiGenerateString(message: ChatMessage): string {
+  return `${message.character.name}: ${message.message.content}`;
 }
