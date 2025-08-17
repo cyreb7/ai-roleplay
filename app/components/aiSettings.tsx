@@ -7,12 +7,14 @@ interface AiManagerProps {
   title: string;
   aiManager: AiManager;
   updateModel: (modelId: AiModel) => void;
+  updateSystemPrompt: (systemPrompt: string) => void;
 }
 
 export default function AiSettings({
   title,
   aiManager,
   updateModel,
+  updateSystemPrompt,
 }: AiManagerProps) {
   const DEFAULT_MODEL = "gemma3:4b";
   const [availableModels, setAvailableModels] = useState<AiModel[]>([
@@ -57,6 +59,17 @@ export default function AiSettings({
             </option>
           ))}
         </select>
+      </div>
+      <div className="mb-4">
+        <label htmlFor="systemPrompt">System Prompt:</label>
+        <textarea
+          id="systemPrompt"
+          value={aiManager.systemPrompt ?? ""}
+          onChange={(e) => updateSystemPrompt(e.target.value)}
+          placeholder="Enter system prompt..."
+          className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+          rows={4}
+        />
       </div>
     </div>
   );

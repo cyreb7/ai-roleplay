@@ -17,9 +17,14 @@ export interface AiModel {
 
 export default class AiManager {
   model: AiModel | null = null;
+  systemPrompt: string | null = null;
   static defaultSettings: object = {
     keep_alive: 60 * 60, // 1 hour
   };
+
+  constructor(systemPrompt: string | null = null) {
+    this.systemPrompt = systemPrompt;
+  }
 
   async getAllModels(): Promise<AiModel[]> {
     const response = await ollama.list();
@@ -40,6 +45,9 @@ export default class AiManager {
       ...chatHistory
         .slice(0, -1)
         .map((msg) => getAiGenerateMessage(aiCharacter, msg)),
+      ...(this.systemPrompt
+        ? [{ role: "system", content: this.systemPrompt }]
+        : []),
       ...getContextMessages(aiCharacter, chatParticipants),
       getGeneralContextMessage(aiCharacter, chatParticipants),
       getAiGenerateMessage(aiCharacter, chatHistory[chatHistory.length - 1]),
@@ -62,6 +70,11 @@ export default class AiManager {
     if (!this.model) {
       throw new Error("No model selected");
     }
+
+    if (this.systemPrompt) {
+      system = `${this.systemPrompt}\n\n${system}`;
+    }
+
     console.debug("Generating prompt...", { system, prompt });
 
     return ollama.generate({

@@ -14,10 +14,11 @@ import {
   makeShortTermGoals,
 } from "./ai/context";
 import { v4 as uuidv4 } from "uuid";
+import characterInstructions from "./prompts/character-instructions.md";
 
 export default function Home() {
   const [chatAiManager, setChatAiManager] = useState<AiManager>(
-    new AiManager(),
+    new AiManager(characterInstructions),
   );
   const [generateAiManager, setGenerateAiManager] = useState<AiManager>(
     new AiManager(),
@@ -101,6 +102,16 @@ export default function Home() {
 
   function updateGenerateModel(model: AiModel) {
     generateAiManager.model = model;
+    setGenerateAiManager(generateAiManager);
+  }
+
+  function updateChatSystemPrompt(systemPrompt: string) {
+    chatAiManager.systemPrompt = systemPrompt;
+    setChatAiManager(chatAiManager);
+  }
+
+  function updateGenerateSystemPrompt(systemPrompt: string) {
+    generateAiManager.systemPrompt = systemPrompt;
     setGenerateAiManager(generateAiManager);
   }
 
@@ -214,11 +225,13 @@ export default function Home() {
           title="Chat AI Settings"
           aiManager={chatAiManager}
           updateModel={updateChatModel}
+          updateSystemPrompt={updateChatSystemPrompt}
         />
         <AiSettings
           title="Generation AI"
           aiManager={generateAiManager}
           updateModel={updateGenerateModel}
+          updateSystemPrompt={updateGenerateSystemPrompt}
         />
       </footer>
     </div>
