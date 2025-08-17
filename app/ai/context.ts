@@ -32,7 +32,7 @@ export function makeShortTermGoals(): Context {
   return {
     name: "Short Term Goals",
     getAiSystemPrompt: (character: Character): string =>
-      `Write a list of short term goals for "${character.name}" using the provided context. Do not respond with anything except the goals.\n\n${getContext(character)}\n\nYou will be given recent chat history for context.`,
+      `Write a list of short term goals for "${character.name}" using the provided context. Do not respond with anything except the goals.\n\n${getContext(character, true)}\n\nYou will be given recent chat history for context.`,
     getGenerateOnNewMessageUserPrompt: (chatLog: ChatMessage[]): string =>
       getAiGenerateContext(chatLog),
     contents: "",
@@ -44,7 +44,7 @@ export function makeLongTermGoals(): Context {
   return {
     name: "Long Term Goals",
     getAiSystemPrompt: (character: Character): string =>
-      `Write a list of long term goals for "${character.name}" using the provided context. Do not respond with anything except the goals.\n\n${getContext(character)}\n\nYou will be given recent chat history for context.`,
+      `Write a list of long term goals for "${character.name}" using the provided context. Do not respond with anything except the goals.\n\n${getContext(character, true)}\n\nYou will be given recent chat history for context.`,
     getGenerateOnNewMessageUserPrompt: (chatLog: ChatMessage[]): string =>
       getAiGenerateContext(chatLog),
     contents: "",

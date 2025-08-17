@@ -7,12 +7,15 @@ export interface Character {
   privateContext: Context[];
 }
 
-export function getContext(character: Character): string {
+export function getContext(
+  character: Character,
+  includePrivate: boolean = false,
+): string {
   let context = `Character Information for "${character.name}":`;
 
   for (const trait of [
     ...character.publicContext,
-    ...character.privateContext,
+    ...(includePrivate ? character.privateContext : []),
   ]) {
     if (trait.contents) {
       context += `\n\n${getTraitContext(trait)}`;
@@ -50,21 +53,10 @@ export function getContextMessages(
   const contextMessages = [];
 
   for (const character of [thisCharacter, ...chatParticipants]) {
-    contextMessages.push({ role: "system", content: getContext(character) });
-
-    if (character === thisCharacter) {
-      const message = {
-        role: "system",
-        content: thisCharacter.privateContext
-          .filter((trait) => trait.contents !== "")
-          .map(getTraitContext)
-          .join("\n\n"),
-      };
-
-      if (message.content) {
-        contextMessages.push();
-      }
-    }
+    contextMessages.push({
+      role: "system",
+      content: getContext(character, character === thisCharacter),
+    });
   }
 
   return contextMessages;
