@@ -15,11 +15,11 @@ export default function AiSettings({
   updateModel,
 }: AiManagerProps) {
   const DEFAULT_MODEL = "gemma3:4b";
-  const [avalibleModels, setAvalibleModels] = useState<AiModel[]>([
+  const [availableModels, setAvailableModels] = useState<AiModel[]>([
     { name: "Loading..." } as AiModel,
   ]);
   const [selectedModel, setSelectedModel] = useState<string>(
-    avalibleModels[0].name,
+    availableModels[0].name,
   );
 
   useEffect(() => {
@@ -27,8 +27,8 @@ export default function AiSettings({
   }, [aiManager]);
 
   async function updateModels() {
-    const models = await aiManager.getAllModesl();
-    setAvalibleModels(models);
+    const models = await aiManager.getAllModels();
+    setAvailableModels(models);
 
     const defaultModel =
       models.find((m) => m.name === DEFAULT_MODEL) ?? models[0];
@@ -51,7 +51,7 @@ export default function AiSettings({
           onChange={(e) => handleModelChange(e.target.value)}
           className="mt-1 block w-full p-2 border rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
         >
-          {avalibleModels.map((model) => (
+          {availableModels.map((model) => (
             <option key={model.name} value={model.name} className="text-black">
               {model.name}
             </option>

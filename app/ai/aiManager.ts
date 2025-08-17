@@ -21,7 +21,7 @@ export default class AiManager {
     keep_alive: 60 * 60, // 1 hour
   };
 
-  async getAllModesl(): Promise<AiModel[]> {
+  async getAllModels(): Promise<AiModel[]> {
     const response = await ollama.list();
     console.debug("Models", response);
     return response.models.map((model) => ({ name: model.name }));

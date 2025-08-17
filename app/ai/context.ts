@@ -21,7 +21,7 @@ export function makeDescription(): Context {
   return {
     name: "Description",
     getAiSystemPrompt: (character: Character): string =>
-      `Write a detailed description for a character named "${character.name}". Do not respond with anything except the descripion.`,
+      `Write a detailed description for a character named "${character.name}". Do not respond with anything except the description.`,
     contents: "",
     generating: false,
     getGenerateOnNewMessageUserPrompt: null,

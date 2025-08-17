@@ -1,11 +1,11 @@
 import React from "react";
 import ChatMessage from "../ai/chatMessage";
 
-interface MessageyProps {
+interface MessageProps {
   message: ChatMessage;
 }
 
-export default function Message({ message }: MessageyProps) {
+export default function Message({ message }: MessageProps) {
   function getContents(): string {
     let contents = message.message.content;
 
