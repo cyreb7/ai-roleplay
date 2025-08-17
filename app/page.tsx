@@ -61,28 +61,37 @@ export default function Home() {
     setChatHistory([...thisChatHistory, newAiMessage]);
 
     try {
-    const response = await chatAiManager.sendMessage(
-      chatHistory,
-      [playerCharacter],
-      aiCharacter,
-    );
+      const response = await chatAiManager.sendMessage(
+        chatHistory,
+        [playerCharacter],
+        aiCharacter,
+      );
 
-    let lastPart;
-    for await (const part of response) {
-      lastPart = part;
-      newAiMessage.message.content += part.message.content;
+      let lastPart;
+      for await (const part of response) {
+        lastPart = part;
+        newAiMessage.message.content += part.message.content;
+        setChatHistory([...thisChatHistory, newAiMessage]);
+      }
+      console.debug("Finished generating message", lastPart);
+      newAiMessage.generating = false;
       setChatHistory([...thisChatHistory, newAiMessage]);
-    }
-    console.debug("Finished generating message", lastPart);
-    newAiMessage.generating = false;
-    setChatHistory([...thisChatHistory, newAiMessage]);
     } catch (e) {
       setChatHistory([...thisChatHistory]);
       throw e;
     }
 
-    generateContextOnNewMessage(aiCharacter, setAiCharacter);
-    generateContextOnNewMessage(playerCharacter, setPlayerCharacter);
+    const updatedChatHistory = [...thisChatHistory, newAiMessage];
+    generateContextOnNewMessage(
+      aiCharacter,
+      setAiCharacter,
+      updatedChatHistory,
+    );
+    generateContextOnNewMessage(
+      playerCharacter,
+      setPlayerCharacter,
+      updatedChatHistory,
+    );
   }
 
   function updateChatModel(model: AiModel) {
@@ -98,6 +107,7 @@ export default function Home() {
   async function generateContextOnNewMessage(
     character: Character,
     setCharacter: (character: Character) => void,
+    chatHistory: ChatMessage[],
   ) {
     for (const context of [
       ...character.privateContext,
@@ -119,28 +129,28 @@ export default function Home() {
     setCharacter({ ...character });
 
     try {
-    const response = await generateAiManager.generate(
-      prompt,
-      context.getAiSystemPrompt(character),
-    );
+      const response = await generateAiManager.generate(
+        prompt,
+        context.getAiSystemPrompt(character),
+      );
 
-    context.contents = "";
-    let lastPart;
-    for await (const part of response) {
-      lastPart = part;
-      context.contents += part.response;
-      setCharacter({ ...character });
-    }
-    console.debug("Finished generating context", {
-      ...lastPart,
-      response: context.contents,
-    });
+      context.contents = "";
+      let lastPart;
+      for await (const part of response) {
+        lastPart = part;
+        context.contents += part.response;
+        setCharacter({ ...character });
+      }
+      console.debug("Finished generating context", {
+        ...lastPart,
+        response: context.contents,
+      });
     } catch (error) {
       context.contents = originalContents;
       throw error;
     } finally {
-    context.generating = false;
-    setCharacter({ ...character });
+      context.generating = false;
+      setCharacter({ ...character });
     }
   }
 

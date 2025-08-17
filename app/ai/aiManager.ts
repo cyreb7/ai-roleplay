@@ -1,4 +1,4 @@
-import ollama from "ollama/browser";
+import { Ollama } from "ollama/browser";
 import ChatMessage, { getAiGenerateMessage } from "./chatMessage";
 import {
   Character,
@@ -6,6 +6,10 @@ import {
   getContextMessages,
 } from "./character";
 import { AbortableAsyncIterator, GenerateResponse, ChatResponse } from "ollama";
+
+const ollama = new Ollama({
+  host: "http://127.0.0.1:11434",
+});
 
 export interface AiModel {
   name: string;
